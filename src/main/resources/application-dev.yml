@@ -1,0 +1,10 @@
+server:
+  port: 13000
+
+spring:
+  application:
+    name: device-manager-mqtt
+
+knife4j:
+  enable: true
+  production: false
