@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lpd.devicemanagermqtt.mapper.UserMapper">
+
+    <insert id="insert" parameterType="org.lpd.devicemanagermqtt.models.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (
+            username,
+            password_hash,
+            email,
+            mobile,
+            status
+        ) VALUES (
+                     #{username},
+                     #{passwordHash},
+                     #{email},
+                     #{mobile},
+                     #{status}
+                 )
+    </insert>
+
+    <select id="findByUsername" resultType="org.lpd.devicemanagermqtt.models.entity.User">
+        SELECT
+            id,
+            username,
+            password_hash AS passwordHash,
+            email,
+            mobile,
+            status,
+            created_time AS createdTime,
+            updated_time AS updatedTime
+        FROM users
+        WHERE username = #{username}
+    </select>
+</mapper>
