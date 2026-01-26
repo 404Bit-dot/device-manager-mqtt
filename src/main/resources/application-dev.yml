@@ -4,16 +4,34 @@ server:
 spring:
   application:
     name: device-manager-mqtt
+
+  # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://47.96.4.246:3306/mqtt_manager?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
     password: 12345678Aa
+
+  # ================= Redis 配置 =================
+  data:
+    redis:
+      host: 122.152.194.133  # 如果 Redis 在远程服务器，请修改为对应的 IP
+      port: 6379
+      password:        # 如果设置了密码请填写
+      database: 0      # 默认数据库为0
+      timeout: 5000ms  # 连接超时时间
+      lettuce:
+        pool:
+          max-active: 20   # 最大连接数（根据 MQTT 并发量可适当调大）
+          max-idle: 10     # 最大空闲连接
+          min-idle: 2      # 最小空闲连接
+          max-wait: 2000ms # 连接等待时间
+  # =============================================
+
 mybatis:
   configuration:
-    map-underscore-to-camel-case: true   # 驼峰
+    map-underscore-to-camel-case: true   # 开启驼峰命名转换
   mapper-locations: classpath:mapper/*.xml
-
 
 knife4j:
   enable: true

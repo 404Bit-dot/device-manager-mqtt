@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.lpd.devicemanagermqtt.support.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,6 +16,9 @@ import java.util.Set;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -66,6 +70,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             unauthorized(response, "Invalid or expired token");
             return;
         }
+
+
+        try {
+            // 1. 解析 Token (这里会校验签名和是否过期)
+            Claims claims = jwtUtil.parseToken(token);
+
+            // 2. 【新增】黑名单校验
+            // 只要能从 Redis 查到这个 token，说明它在黑名单里
+            String blacklistKey = "jwt:blacklist:" + token;
+            if (redisUtils.get(blacklistKey) != null) {
+                unauthorized(response, "Token has been invalidated (Logged out)");
+                return;
+            }
+
+            request.setAttribute("username", claims.getSubject());
+            // 将 claims 存入 request 方便后面注销时快速获取过期时间
+            request.setAttribute("claims", claims);
+
+        } catch (JwtException e) {
+            unauthorized(response, "Invalid or expired token");
+            return;
+        }
+
+        filterChain.doFilter(request, response);
 
         // 4. 校验通过，放行
         filterChain.doFilter(request, response);

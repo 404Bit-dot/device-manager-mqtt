@@ -38,4 +38,9 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // 在 JwtUtil 类中添加
+    public Date getExpirationDate(Claims claims) {
+        return claims.getExpiration();
+    }
 }
